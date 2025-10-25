@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Trading Mini</title>
+    
+    <!-- === SCRIPT CEK MAINTENANCE === -->
+    <script>
+        // Cek maintenance mode sebelum tampilkan login form
+        if (localStorage.getItem('maintenanceMode') === 'true') {
+            window.location.href = 'maintenance-mode.html';
+        }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .additional-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .additional-links a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .additional-links a:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            margin: 25px 0;
+            text-align: center;
+            position: relative;
+            color: #7f8c8d;
+        }
+
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ecf0f1;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+        }
+
+        .demo-accounts {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .demo-accounts h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .demo-accounts p {
+            margin: 5px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .alert-error {
+            background: #ffeaa7;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-success {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>💰 Trading Mini</h1>
+            <p>Login ke akun trading Anda</p>
+        </div>
+
+        <div id="alertMessage" class="alert">
+            <!-- Pesan error/success akan muncul di sini -->
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username atau Email</label>
+                <input type="text" id="username" name="username" placeholder="Masukkan username atau email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+            </div>
+
+            <button type="submit" class="login-btn">Masuk ke Akun</button>
+        </form>
+
+        <div class="additional-links">
+            <a href="#">Lupa Password?</a>
+            <span> • </span>
+            <a href="#">Daftar Akun Baru</a>
+        </div>
+
+        <div class="divider">
+            <span>Atau</span>
+        </div>
+
+        <div class="demo-accounts">
+            <h4>🔐 Demo Accounts (Testing)</h4>
+            <p><strong>User:</strong> a / 1</p>
+            <p><strong>Admin:</strong> admin / admin123</p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Trading Mini. All rights reserved.</p>
+            <p>v2.1.0</p>
+        </div>
+    </div>
+
+    <script>
+// Fungsi untuk mendapatkan users dengan fix lengkap
+function getUsers() {
+    try {
+        const usersData = localStorage.getItem('tradingUsers');
+        
+        if (!usersData) {
+            return createDemoAccounts();
+        }
+        
+        const parsedData = JSON.parse(usersData);
+        
+        if (Array.isArray(parsedData) && parsedData.length > 0) {
+            const needsFix = parsedData.some(user => !user.username || !user.email);
+            
+            if (needsFix) {
+                return fixArrayData(parsedData);
+            } else {
+                return parsedData;
+            }
+        } else if (parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)) {
+            return convertObjectFormat(parsedData);
+        } else {
+            return createDemoAccounts();
+        }
+        
+    } catch (error) {
+        console.error('Error loading users:', error);
+        return createDemoAccounts();
+    }
+}
+
+// Fix array data yang tidak lengkap
+function fixArrayData(incompleteArray) {
+    const fixedUsers = [];
+    
+    incompleteArray.forEach((userData, index) => {
+        const fixedUser = {
+            id: userData.id || Date.now() + index,
+            username: userData.username || 'user' + (index + 1),
+            password: userData.password,
+            fullname: userData.fullname || 'User ' + (index + 1),
+            email: userData.email || `user${index + 1}@trading.com`,
+            phone: userData.phone || '08123456789',
+            role: userData.role || 'user',
+            status: userData.status || 'active',
+            registeredAt: userData.registeredAt || new Date().toISOString(),
+            balance: userData.saldo || userData.balance || 0,
+            history: userData.history || []
+        };
+        fixedUsers.push(fixedUser);
+    });
+    
+    if (!fixedUsers.find(user => user.role === 'admin')) {
+        fixedUsers.push({
+            id: 1,
+            username: 'admin',
+            password: 'admin123',
+            fullname: 'Admin User',
+            email: 'admin@trading.com',
+            phone: '08123456789',
+            role: 'admin',
+            status: 'active',
+            registeredAt: new Date().toISOString(),
+            balance: 0,
+            history: []
+        });
+    }
+    
+    localStorage.setItem('tradingUsers', JSON.stringify(fixedUsers));
+    return fixedUsers;
+}
+
+// Convert format object lama
+function convertObjectFormat(oldData) {
+    const newUsers = [];
+    
+    Object.keys(oldData).forEach(username => {
+        const oldUser = oldData[username];
+        
+        const newUser = {
+            id: Date.now() + Math.random(),
+            username: username,
+            password: oldUser.password || 'default123',
+            fullname: username,
+            email: `${username}@trading.com`,
+            phone: '08123456789',
+            role: username === 'admin' ? 'admin' : 'user',
+            status: 'active',
+            registeredAt: new Date().toISOString(),
+            balance: oldUser.saldo || 0,
+            history: oldUser.history || []
+        };
+        
+        newUsers.push(newUser);
+    });
+    
+    if (!newUsers.find(user => user.username === 'admin')) {
+        newUsers.push({
+            id: 1,
+            username: 'admin',
+            password: 'admin123',
+            fullname: 'Admin User',
+            email: 'admin@trading.com',
+            phone: '08123456789',
+            role: 'admin',
+            status: 'active',
+            registeredAt: new Date().toISOString(),
+            balance: 0,
+            history: []
+        });
+    }
+    
+    localStorage.setItem('tradingUsers', JSON.stringify(newUsers));
+    return newUsers;
+}
+
+// Buat demo accounts
+function createDemoAccounts() {
+    const demoUsers = [
+        {
+            id: 1,
+            username: 'admin',
+            password: 'admin123',
+            fullname: 'Admin User',
+            email: 'admin@trading.com',
+            phone: '08123456789',
+            role: 'admin',
+            status: 'active',
+            balance: 0,
+            history: []
+        },
+        {
+            id: 2,
+            username: 'user123',
+            password: 'password123',
+            fullname: 'Demo User',
+            email: 'user@trading.com',
+            phone: '08123456789',
+            role: 'user',
+            status: 'active',
+            balance: 1000000,
+            history: []
+        }
+    ];
+    
+    localStorage.setItem('tradingUsers', JSON.stringify(demoUsers));
+    return demoUsers;
+}
+
+// Handle login form submission
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const alertMessage = document.getElementById('alertMessage');
+    
+    // Reset alert
+    alertMessage.style.display = 'none';
+    alertMessage.className = 'alert';
+    
+    if (!username || !password) {
+        showAlert('Username dan password harus diisi!', 'error');
+        return;
+    }
+    
+    const users = getUsers();
+    
+    const user = users.find(u => {
+        return (u.username === username || u.email === username) && u.password === password;
+    });
+    
+    if (user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        
+        showAlert(`Login berhasil! Selamat datang ${user.fullname}`, 'success');
+        
+        // FIX: Redirect yang benar
+        setTimeout(function() {
+            if (user.role === 'admin') {
+                // Pastikan file admin-dashboard.html ada
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                // Pastikan file user-dashboard.html ada  
+                window.location.href = 'user-dashboard.html';
+            }
+        }, 1500);
+        
+    } else {
+        showAlert('Username/email atau password salah!', 'error');
+    }
+});
+
+// Helper function untuk show alert
+function showAlert(message, type) {
+    const alertMessage = document.getElementById('alertMessage');
+    alertMessage.textContent = message;
+    alertMessage.className = `alert alert-${type}`;
+    alertMessage.style.display = 'block';
+}
+
+// Tampilkan pesan sukses jika baru register
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('registered') === 'true') {
+    showAlert('Pendaftaran berhasil! Silakan login.', 'success');
+}
+
+// Clear error message when user starts typing
+document.getElementById('username').addEventListener('input', function() {
+    document.getElementById('alertMessage').style.display = 'none';
+});
+
+document.getElementById('password').addEventListener('input', function() {
+    document.getElementById('alertMessage').style.display = 'none';
+});
+    </script>
+</body>
+</html>

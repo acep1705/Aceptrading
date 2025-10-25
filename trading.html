@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trading - Trading Mini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 15px;
+            color: white;
+            overflow-x: hidden;
+        }
+        .trading-container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .trading-header {
+            background: rgba(44, 62, 80, 0.95);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .trading-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .balance-info {
+            background: rgba(52, 152, 219, 0.4);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .back-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .trading-main {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .chart-section {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            order: 1;
+        }
+        .chart-placeholder {
+            height: 250px;
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #bdc3c7;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .price-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .price-info > div {
+            background: rgba(52, 152, 219, 0.2);
+            padding: 12px 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .price-info > div:first-child {
+            grid-column: 1 / -1;
+            background: rgba(41, 128, 185, 0.3);
+        }
+        .current-price {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .price-change {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .change-up { color: #2ecc71; }
+        .change-down { color: #e74c3c; }
+        .trading-panel {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            order: 2;
+        }
+        .trade-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: 500;
+            color: #ecf0f1;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select {
+            padding: 14px 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            width: 100%;
+        }
+        .form-group input::placeholder {
+            color: #bdc3c7;
+        }
+        .trade-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .btn-buy {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+        .btn-sell {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        .btn-buy:active, .btn-sell:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .volume-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .volume-btn {
+            background: rgba(52, 152, 219, 0.3);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .volume-btn:active {
+            background: rgba(52, 152, 219, 0.6);
+            transform: scale(0.95);
+        }
+        .recent-trades {
+            margin-top: 20px;
+        }
+        .recent-trades h4 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .trades-list {
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .trade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+            font-size: 14px;
+        }
+        .trade-buy { border-left-color: #2ecc71; }
+        .trade-sell { border-left-color: #e74c3c; }
+        .trade-profit { color: #2ecc71; font-weight: bold; }
+        .trade-loss { color: #e74c3c; font-weight: bold; }
+        .history-section {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            order: 3;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 12px;
+        }
+        .data-table th,
+        .data-table td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .data-table th {
+            background: rgba(52, 152, 219, 0.4);
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .data-table td {
+            font-size: 11px;
+        }
+        .status-win { color: #2ecc71; font-weight: bold; }
+        .status-lose { color: #e74c3c; font-weight: bold; }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .trading-header {
+                padding: 12px 15px;
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            .trading-header h1 {
+                font-size: 18px;
+            }
+            .user-info {
+                justify-content: center;
+                width: 100%;
+            }
+            .trading-main {
+                padding: 15px;
+                gap: 15px;
+            }
+            .chart-section,
+            .trading-panel,
+            .history-section {
+                padding: 15px;
+            }
+            .chart-placeholder {
+                height: 200px;
+                font-size: 14px;
+            }
+            .current-price {
+                font-size: 20px;
+            }
+            .price-info {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .price-info > div:first-child {
+                grid-column: 1;
+            }
+            .trade-buttons {
+                grid-template-columns: 1fr;
+            }
+            .btn-buy, .btn-sell {
+                padding: 18px;
+                font-size: 16px;
+            }
+            .volume-controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="trading-container">
+        <header class="trading-header">
+            <h1>📊 Trading Platform</h1>
+            <div class="user-info">
+                <div class="balance-info">
+                    Saldo: Rp <span id="userBalance">0</span>
+                </div>
+                <a href="user-dashboard.html" class="back-btn">← Kembali</a>
+            </div>
+        </header>
+
+        <main class="trading-main">
+            <div class="chart-section">
+                <h3>📈 Grafik Harga Real-time</h3>
+                <div class="chart-placeholder">
+                    🚀 Grafik Trading Live
+                    <br>
+                    <small style="margin-top: 8px; display: block; font-size: 14px;">
+                        Live Price: <span id="currentPrice">0</span>
+                    </small>
+                </div>
+                <div class="price-info">
+                    <div>
+                        <div>Harga Saat Ini</div>
+                        <div class="current-price" id="currentPriceText">-</div>
+                    </div>
+                    <div>
+                        <div>Perubahan</div>
+                        <div id="priceChange" class="price-change">-</div>
+                    </div>
+                    <div>
+                        <div>Volume</div>
+                        <div id="volumeText">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trading-panel">
+                <h3>🎯 Trading Panel</h3>
+                <div class="trade-form">
+                    <div class="form-group">
+                        <label for="tradeAmount">Jumlah Trading (Rp)</label>
+                        <input type="number" id="tradeAmount" placeholder="Masukkan jumlah" value="1000" min="1000">
+                    </div>
+                    
+                    <div class="volume-controls">
+                        <div class="volume-btn" onclick="setVolume(1000)">1K</div>
+                        <div class="volume-btn" onclick="setVolume(5000)">5K</div>
+                        <div class="volume-btn" onclick="setVolume(10000)">10K</div>
+                        <div class="volume-btn" onclick="setVolume(50000)">50K</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timeFrame">Durasi Trading (Detik)</label>
+                        <select id="timeFrame">
+                            <option value="5">5 Detik</option>
+                            <option value="10">10 Detik</option>
+                            <option value="15" selected>15 Detik</option>
+                            <option value="30">30 Detik</option>
+                            <option value="60">60 Detik</option>
+                        </select>
+                    </div>
+
+                    <div class="trade-buttons">
+                        <button class="btn-buy" onclick="placeTrade('naik')">
+                            📈 BELI (Naik)
+                        </button>
+                        <button class="btn-sell" onclick="placeTrade('turun')">
+                            📉 JUAL (Turun)
+                        </button>
+                    </div>
+
+                    <div class="recent-trades">
+                        <h4>⚡ Trade Terbaru</h4>
+                        <div class="trades-list" id="recentTrades">
+                            <!-- Recent trades will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <h3>📋 Riwayat Trading</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Type</th>
+                            <th>Volume</th>
+                            <th>Result</th>
+                            <th>Profit/Loss</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradingHistory">
+                        <!-- Trading history will appear here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Trading variables
+        let currentPrice = 1000;
+        let priceHistory = [];
+        let isPriceGoingUp = true;
+
+        // Load user data and initialize trading
+        function loadTradingData() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            // Update user balance
+            document.getElementById('userBalance').textContent = (currentUser.balance || 0).toLocaleString('id-ID');
+            
+            // Initialize price
+            updatePriceDisplay();
+            startPriceSimulation();
+            
+            // Load trading history
+            loadTradingHistory(currentUser);
+            loadRecentTrades();
+        }
+
+        // Simulate price changes
+        function startPriceSimulation() {
+            setInterval(() => {
+                // Random price movement
+                const change = (Math.random() - 0.5) * 20;
+                currentPrice = Math.max(100, currentPrice + change);
+                
+                // Occasionally reverse trend
+                if (Math.random() < 0.1) {
+                    isPriceGoingUp = !isPriceGoingUp;
+                }
+                
+                // Add slight bias based on trend
+                if (isPriceGoingUp) {
+                    currentPrice += Math.random() * 5;
+                } else {
+                    currentPrice -= Math.random() * 5;
+                }
+                
+                currentPrice = Math.round(currentPrice * 100) / 100;
+                updatePriceDisplay();
+                
+            }, 2000); // Update every 2 seconds
+        }
+
+        function updatePriceDisplay() {
+            const priceElement = document.getElementById('currentPrice');
+            const priceTextElement = document.getElementById('currentPriceText');
+            const changeElement = document.getElementById('priceChange');
+            
+            if (priceElement) priceElement.textContent = currentPrice.toLocaleString('id-ID');
+            if (priceTextElement) priceTextElement.textContent = currentPrice.toLocaleString('id-ID');
+            
+            // Calculate change (simulated)
+            const change = (Math.random() - 0.4) * 10;
+            const changePercent = ((change / currentPrice) * 100).toFixed(2);
+            
+            if (changeElement) {
+                changeElement.textContent = `${change >= 0 ? '+' : ''}${changePercent}%`;
+                changeElement.className = `price-change ${change >= 0 ? 'change-up' : 'change-down'}`;
+            }
+            
+            document.getElementById('volumeText').textContent = Math.floor(Math.random() * 1000).toLocaleString('id-ID');
+        }
+
+        function setVolume(amount) {
+            document.getElementById('tradeAmount').value = amount;
+        }
+
+        function placeTrade(direction) {
+            const amount = parseInt(document.getElementById('tradeAmount').value);
+            const timeFrame = parseInt(document.getElementById('timeFrame').value);
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            if (!amount || amount < 1000) {
+                alert('Jumlah trading minimal Rp 1,000!');
+                return;
+            }
+            
+            if (amount > (currentUser.balance || 0)) {
+                alert('Saldo tidak cukup!');
+                return;
+            }
+            
+            // Kurangi saldo sementara
+            currentUser.balance = (currentUser.balance || 0) - amount;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            document.getElementById('userBalance').textContent = currentUser.balance.toLocaleString('id-ID');
+            
+            const startPrice = currentPrice;
+            
+            // Show countdown
+            showTradeCountdown(timeFrame, direction, amount, startPrice);
+        }
+
+        // FUNCTION BARU - Countdown Timer
+        function showTradeCountdown(duration, direction, amount, startPrice) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.9); z-index: 1000; display: flex; 
+                align-items: center; justify-content: center; flex-direction: column;
+                color: white; font-size: 24px;
+            `;
+            
+            let timeLeft = duration;
+            
+            modal.innerHTML = `
+                <div style="text-align: center; background: rgba(44,62,80,0.95); padding: 30px; border-radius: 15px; border: 2px solid #3498db;">
+                    <h2>⏳ Trading in Progress</h2>
+                    <div style="font-size: 48px; font-weight: bold; margin: 20px 0; color: #3498db;" id="countdownTimer">${timeLeft}</div>
+                    <p>Direction: <strong>${direction === 'naik' ? '📈 UP' : '📉 DOWN'}</strong></p>
+                    <p>Amount: <strong>Rp ${amount.toLocaleString('id-ID')}</strong></p>
+                    <p>Wait for result...</p>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            const countdownElement = document.getElementById('countdownTimer');
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    processTradeResult(direction, amount, startPrice);
+                    document.body.removeChild(modal);
+                }
+            }, 1000);
+        }
+
+        // FUNCTION BARU - Process Trade Result setelah countdown
+        function processTradeResult(direction, amount, startPrice) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const timeFrame = parseInt(document.getElementById('timeFrame').value);
+            
+            // Simulate price movement
+            const endPrice = simulatePriceMovement(startPrice, direction, timeFrame);
+            const result = calculateTradeResult(direction, startPrice, endPrice);
+            const profit = result === 'win' ? Math.floor(amount * 1.8) : -amount;
+            
+            // Kembalikan saldo awal + profit
+            currentUser.balance = (currentUser.balance || 0) + amount + profit;
+            
+            // Add to history
+            if (!currentUser.history) currentUser.history = [];
+            const tradeRecord = {
+                type: 'trade',
+                direction: direction,
+                volume: amount,
+                result: result,
+                profit: profit,
+                startPrice: startPrice,
+                endPrice: endPrice,
+                timestamp: new Date().toLocaleString('id-ID'),
+                status: 'completed'
+            };
+            
+            currentUser.history.push(tradeRecord);
+            
+            // Save data
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateUsersInLocalStorage(currentUser);
+            
+            // Update UI
+            document.getElementById('userBalance').textContent = currentUser.balance.toLocaleString('id-ID');
+            loadTradingHistory(currentUser);
+            
+            // Show result
+            showTradeResult(result, profit, direction);
+        }
+
+        function simulatePriceMovement(startPrice, predictedDirection, timeFrame) {
+            // More realistic price simulation
+            let endPrice = startPrice;
+            const volatility = timeFrame * 0.5;
+            
+            for (let i = 0; i < timeFrame; i++) {
+                const randomMove = (Math.random() - 0.5) * volatility;
+                endPrice += randomMove;
+            }
+            
+            // Add some market bias
+            const marketBias = Math.random() - 0.5;
+            endPrice += marketBias * 10;
+            
+            return Math.round(endPrice * 100) / 100;
+        }
+
+        function calculateTradeResult(predictedDirection, startPrice, endPrice) {
+            const actualDirection = endPrice > startPrice ? 'naik' : 'turun';
+            return predictedDirection === actualDirection ? 'win' : 'lose';
+        }
+
+        function showTradeResult(result, profit, direction) {
+            const message = result === 'win' 
+                ? `🎉 SELAMAT! Trade ${direction} berhasil!\nProfit: Rp ${profit.toLocaleString('id-ID')}`
+                : `😞 SAYANG! Trade ${direction} gagal.\nLoss: Rp ${Math.abs(profit).toLocaleString('id-ID')}`;
+            
+            alert(message);
+            addRecentTrade(result, profit, direction);
+        }
+
+        function addRecentTrade(result, profit, direction) {
+            const tradesList = document.getElementById('recentTrades');
+            const tradeItem = document.createElement('div');
+            
+            tradeItem.className = `trade-item ${direction === 'naik' ? 'trade-buy' : 'trade-sell'}`;
+            tradeItem.innerHTML = `
+                <div>
+                    <strong>${direction === 'naik' ? '📈 BELI' : '📉 JUAL'}</strong>
+                    <div style="font-size: 11px; color: #bdc3c7;">${new Date().toLocaleTimeString()}</div>
+                </div>
+                <div class="${profit >= 0 ? 'trade-profit' : 'trade-loss'}">
+                    ${profit >= 0 ? '+' : ''}Rp ${Math.abs(profit).toLocaleString('id-ID')}
+                </div>
+            `;
+            
+            tradesList.insertBefore(tradeItem, tradesList.firstChild);
+            
+            // Keep only last 5 trades
+            while (tradesList.children.length > 5) {
+                tradesList.removeChild(tradesList.lastChild);
+            }
+        }
+
+        function loadTradingHistory(user) {
+            const tbody = document.getElementById('tradingHistory');
+            
+            if (user.history && Array.isArray(user.history)) {
+                const tradingHistory = user.history
+                    .filter(transaction => transaction.type === 'trade')
+                    .slice(-8)
+                    .reverse();
+                
+                tbody.innerHTML = '';
+                
+                if (tradingHistory.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 15px; color: #bdc3c7; font-size: 12px;">
+                                📭 Belum ada riwayat trading
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tradingHistory.forEach(trade => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${trade.timestamp.split(',')[1] || trade.timestamp}</td>
+                        <td>
+                            <span style="color: ${trade.direction === 'naik' ? '#2ecc71' : '#e74c3c'}; font-weight: bold;">
+                                ${trade.direction === 'naik' ? 'BUY' : 'SELL'}
+                            </span>
+                        </td>
+                        <td>${trade.volume.toLocaleString('id-ID')}</td>
+                        <td>
+                            <span class="status-${trade.result}">
+                                ${trade.result.toUpperCase()}
+                            </span>
+                        </td>
+                        <td style="color: ${trade.profit >= 0 ? '#2ecc71' : '#e74c3c'}; font-weight: bold;">
+                            ${trade.profit >= 0 ? '+' : ''}${Math.abs(trade.profit).toLocaleString('id-ID')}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+
+        function loadRecentTrades() {
+            const trades = [
+                { direction: 'naik', profit: 1800, time: '23:01:15' },
+                { direction: 'turun', profit: -1000, time: '23:00:45' },
+                { direction: 'naik', profit: 3600, time: '22:59:30' },
+                { direction: 'turun', profit: 2700, time: '22:58:15' }
+            ];
+            
+            const tradesList = document.getElementById('recentTrades');
+            tradesList.innerHTML = '';
+            
+            trades.forEach(trade => {
+                const tradeItem = document.createElement('div');
+                tradeItem.className = `trade-item ${trade.direction === 'naik' ? 'trade-buy' : 'trade-sell'}`;
+                tradeItem.innerHTML = `
+                    <div>
+                        <strong>${trade.direction === 'naik' ? '📈 BELI' : '📉 JUAL'}</strong>
+                        <div style="font-size: 11px; color: #bdc3c7;">${trade.time}</div>
+                    </div>
+                    <div class="${trade.profit >= 0 ? 'trade-profit' : 'trade-loss'}">
+                        ${trade.profit >= 0 ? '+' : ''}Rp ${Math.abs(trade.profit).toLocaleString('id-ID')}
+                    </div>
+                `;
+                tradesList.appendChild(tradeItem);
+            });
+        }
+
+        function updateUsersInLocalStorage(updatedUser) {
+            try {
+                const users = JSON.parse(localStorage.getItem('tradingUsers') || '[]');
+                const userIndex = users.findIndex(user => user.id === updatedUser.id);
+                
+                if (userIndex !== -1) {
+                    users[userIndex] = updatedUser;
+                    localStorage.setItem('tradingUsers', JSON.stringify(users));
+                }
+            } catch (error) {
+                console.error('Error updating users:', error);
+            }
+        }
+
+        // Initialize trading page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTradingData();
+        });
+    </script>
+</body>
+</html>

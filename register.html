@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - Trading Mini</title>
+    
+    <!-- Script cek maintenance -->
+    <script>
+        if (localStorage.getItem('maintenanceMode') === 'true') {
+            window.location.href = 'maintenance-mode.html';
+        }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .logo p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .checkbox-group input {
+            margin-top: 3px;
+        }
+        .checkbox-group label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .checkbox-group a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .register-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .register-btn:hover {
+            transform: translateY(-2px);
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-link a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-success {
+            background: #d1edf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .password-strength {
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .strength-weak { color: #e74c3c; }
+        .strength-medium { color: #f39c12; }
+        .strength-strong { color: #27ae60; }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <h1>📝 Daftar Akun</h1>
+            <p>Buat akun trading Anda</p>
+        </div>
+
+        <div id="alertMessage" class="alert">
+            <!-- Pesan error/success akan muncul di sini -->
+        </div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="fullname">Nama Lengkap</label>
+                <input type="text" id="fullname" name="fullname" placeholder="Masukkan nama lengkap" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="contoh@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Pilih username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Nomor Telepon</label>
+                <input type="tel" id="phone" name="phone" placeholder="08xxxxxxxxxx" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Minimal 8 karakter" required>
+                <div class="password-strength" id="passwordStrength"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Konfirmasi Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Ulangi password" required>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                <label for="agreeTerms">
+                    Saya menyetujui <a href="#">Syarat & Ketentuan</a> dan <a href="#">Kebijakan Privasi</a>
+                </label>
+            </div>
+
+            <button type="submit" class="register-btn">Daftar Sekarang</button>
+        </form>
+
+        <div class="login-link">
+            <p>Sudah punya akun? <a href="login.html">Masuk di sini</a></p>
+        </div>
+    </div>
+
+    <script>
+     // Fungsi untuk mendapatkan dan menyimpan users dengan fix
+function getUsers() {
+    try {
+        const usersData = localStorage.getItem('tradingUsers');
+        
+        if (!usersData) {
+            return [];
+        }
+        
+        const parsedData = JSON.parse(usersData);
+        
+        // Handle semua format data seperti di login.html
+        if (Array.isArray(parsedData) && parsedData.length > 0) {
+            const needsFix = parsedData.some(user => !user.username || !user.email);
+            
+            if (needsFix) {
+                return fixArrayData(parsedData);
+            } else {
+                return parsedData;
+            }
+        } else if (parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)) {
+            return convertObjectFormat(parsedData);
+        } else {
+            return [];
+        }
+        
+    } catch (error) {
+        console.error('Error loading users:', error);
+        return [];
+    }
+}
+
+// Tambahkan juga function fixArrayData dan convertObjectFormat di register.html
+// (Copy dari login.html)
+
+function saveUsers(users) {
+    try {
+        // Pastikan selalu simpan sebagai array
+        if (!Array.isArray(users)) {
+            console.error('Trying to save non-array data:', users);
+            return false;
+        }
+        localStorage.setItem('tradingUsers', JSON.stringify(users));
+        console.log('Users saved successfully:', users);
+        return true;
+    } catch (error) {
+        console.error('Error saving users:', error);
+        return false;
+    }
+}
+
+// Password strength checker
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strengthElement = document.getElementById('passwordStrength');
+    
+    let strength = '';
+    let strengthClass = '';
+    
+    if (password.length === 0) {
+        strength = '';
+    } else if (password.length < 6) {
+        strength = 'Lemah';
+        strengthClass = 'strength-weak';
+    } else if (password.length < 8) {
+        strength = 'Sedang';
+        strengthClass = 'strength-medium';
+    } else {
+        strength = 'Kuat';
+        strengthClass = 'strength-strong';
+    }
+    
+    strengthElement.textContent = strength;
+    strengthElement.className = 'password-strength ' + strengthClass;
+});
+
+// Handle registration form
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const fullname = document.getElementById('fullname').value;
+    const email = document.getElementById('email').value;
+    const username = document.getElementById('username').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const alertMessage = document.getElementById('alertMessage');
+    
+    // Reset alert
+    alertMessage.style.display = 'none';
+    alertMessage.className = 'alert';
+    
+    // Validasi
+    if (password !== confirmPassword) {
+        alertMessage.textContent = 'Password dan konfirmasi password tidak sama!';
+        alertMessage.className = 'alert alert-error';
+        alertMessage.style.display = 'block';
+        return;
+    }
+    
+    if (password.length < 6) {
+        alertMessage.textContent = 'Password minimal 6 karakter!';
+        alertMessage.className = 'alert alert-error';
+        alertMessage.style.display = 'block';
+        return;
+    }
+    
+    // Dapatkan users
+    const users = getUsers();
+    console.log('Current users for registration check:', users);
+    
+    // Pastikan users adalah array
+    if (!Array.isArray(users)) {
+        alertMessage.textContent = 'Error sistem. Silakan refresh halaman.';
+        alertMessage.className = 'alert alert-error';
+        alertMessage.style.display = 'block';
+        return;
+    }
+    
+    // Cek apakah username/email sudah ada
+    const existingUser = users.find(user => 
+        user.username === username || user.email === email
+    );
+    
+    if (existingUser) {
+        alertMessage.textContent = 'Username atau email sudah terdaftar!';
+        alertMessage.className = 'alert alert-error';
+        alertMessage.style.display = 'block';
+        return;
+    }
+    
+    // Tambah user baru
+    const newUser = {
+        id: Date.now(),
+        fullname: fullname,
+        email: email,
+        username: username,
+        phone: phone,
+        password: password,
+        role: 'user',
+        status: 'active',
+        registeredAt: new Date().toISOString(),
+        balance: 0
+    };
+    
+    users.push(newUser);
+    
+    // Simpan ke localStorage
+    if (saveUsers(users)) {
+        // Success message
+        alertMessage.textContent = 'Pendaftaran berhasil! Redirecting...';
+        alertMessage.className = 'alert alert-success';
+        alertMessage.style.display = 'block';
+        
+        // Redirect ke login setelah 2 detik
+        setTimeout(() => {
+            window.location.href = 'login.html?registered=true';
+        }, 2000);
+    } else {
+        alertMessage.textContent = 'Error menyimpan data. Silakan coba lagi.';
+        alertMessage.className = 'alert alert-error';
+        alertMessage.style.display = 'block';
+    }
+});
+
+// Clear error message when user starts typing
+const inputs = document.querySelectorAll('input');
+inputs.forEach(input => {
+    input.addEventListener('input', function() {
+        document.getElementById('alertMessage').style.display = 'none';
+    });
+});
+
+// Debug: Tampilkan data users saat page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== DEBUG USER DATA (REGISTER) ===');
+    const users = getUsers();
+    console.log('Current users:', users);
+    console.log('Is array?:', Array.isArray(users));
+    console.log('===============================');
+});
+    </script>
+</body>
+</html>
